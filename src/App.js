@@ -1,25 +1,54 @@
-import logo from './logo.svg';
-import './App.css';
+import * as React from "react";
+import { useRef, useState } from "react";
+import { motion } from "framer-motion";
+import { useDimensions } from "./use-dimensions";
+import { Navigation } from "./Navigation";
+import { MenuToggle } from "./MenuToggle";
 
-function App() {
+const sidebar = {
+  open: (height = 1000) => ({
+    clipPath: `circle(${height * 2 + 200}px at 40px 40px)`,
+    transition: {
+      type: "spring",
+      stiffness: 20,
+      restDelta: 2,
+    },
+  }),
+  closed: {
+    clipPath: "circle(30px at 40px 40px)",
+    transition: {
+      delay: 0.5,
+      type: "spring",
+      stiffness: 400,
+      damping: 40,
+    },
+  },
+};
+const App = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef(null);
+  const { height } = useDimensions(containerRef);
+
+  const toggleOpen = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const closeToggle = () => {
+    setIsOpen(false);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <motion.nav
+      initial={false}
+      animate={isOpen ? "open" : "closed"}
+      custom={height}
+      ref={containerRef}
+    >
+      <motion.div className="background" variants={sidebar} />
+      <Navigation />
+      <MenuToggle toggle={() => toggleOpen()} close={closeToggle} />
+    </motion.nav>
   );
-}
+};
 
 export default App;
